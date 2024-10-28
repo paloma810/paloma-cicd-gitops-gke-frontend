@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-app-front-configmap
+data:
+  VUE_APP_BACKEND_PORT: "80"
+  VUE_APP_BACKEND_SERVER: "www.hato-inds.com"
