@@ -65,3 +65,4 @@ steps:
     - 'CLOUDSDK_CORE_PROJECT=${_GKE_PROJECT_ID}'
   id: kubectl apply
 
+ 
