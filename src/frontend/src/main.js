@@ -13,7 +13,7 @@ const backend_port = process.env.VUE_APP_BACKEND_PORT
 const app = createApp(App)
 
 app.config.globalProperties.$axios = axios.create({
-  baseURL: `http://${backend_server}:${backend_port}/`
+  baseURL: `https://${backend_server}:${backend_port}/`
 });
 
 app
