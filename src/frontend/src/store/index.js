@@ -1,9 +1,9 @@
 import { createStore } from 'vuex';
 import axios from 'axios';
-import jwtDecode from 'jwt-decode';
 
 const backend_server = process.env.VUE_APP_BACKEND_SERVER
 const backend_port = process.env.VUE_APP_BACKEND_PORT
+const protocol = process.env.NODE_ENV === 'PROD' ? 'https' : 'http'
 
 const store = createStore({
   state() {
@@ -34,61 +34,55 @@ const store = createStore({
     },
   },
   actions: {
-    async login({ commit }, credentials) {
+    async login(_, credentials) {
       try {
         console.log(credentials);
         console.log(`${backend_server}`)
         console.log(`${backend_port}`)
-        const response = await axios.post(`https://${backend_server}:${backend_port}/api/authenticate`, credentials, { headers: {
-          'Content-Type': 'application/json'}});
+        const response = await axios.post(`${protocol}://${backend_server}:${backend_port}/api/authenticate`, credentials, { 
+          withCredentials: true,
+          headers: { 'Content-Type': 'application/json' }
+        });
+
         const message = response.data.message;
-        console.log(message);
-
-        if (message == "Login successful") {
-          const token = response.data.token;
-          commit('setToken', token);
-        
-          // トークンをデコードしてユーザ情報を取得
-          const decodedToken = jwtDecode(token);
-          commit('setUser', { id: decodedToken.userId, username: decodedToken.username });
-        
-          commit('setAuthentication', true);
-          console.log("setAuthenticated true");
+        if (message === "Login successful") {
+          // ログイン成功直後、そのままcheckAuthenticationを呼び出してユーザー情報を取得するのも効率的です
+          await this.dispatch('checkAuthentication');
         }
-
         return Promise.resolve(message);
       } catch (error) {
-        // エラーハンドリングをここに追加
         console.error('Login error:', error);
-        return Promise.reject(error.response.data.message);
+        return Promise.reject(error.response?.data?.message || 'Login failed');
       }
     },
-    checkAuthentication({ commit }) {
-      const token = localStorage.getItem('token');
+    async checkAuthentication({ commit }) {
+      try {
+        const response = await axios.get(`${protocol}://${backend_server}:${backend_port}/api/me`, {
+          withCredentials: true // Cookieを送信するために必須
+        });
 
-      if (token) {
-        const decodedToken = jwtDecode(token);
-
-        // トークンが有効であるか確認
-        if (decodedToken.exp * 1000 > Date.now()) {
-          commit('setAuthentication', true);
-          commit('setUser', {
-            id: decodedToken.userId,
-            username: decodedToken.username,
-          });
-        } else {
-          // トークンが有効期限切れの場合
-          commit('setAuthentication', false);
-          commit('setUser', null);
-          localStorage.removeItem('token'); // ローカルストレージからトークンを削除
-        }
-      } else {
+        // /api/me が 200 OK でユーザー情報を返した場合
+        commit('setAuthentication', true);
+        commit('setUser', { 
+          id: response.data.userId, 
+          username: response.data.username 
+        });
+      } catch (error) {
+        // 401エラー（未認証/期限切れ）の場合は認証情報をクリア
         commit('setAuthentication', false);
         commit('setUser', null);
       }
     },
     async logout({ commit }) {
-      commit('logout');
+      try {
+        // バックエンド側でもCookieを削除（期限切れに）する
+        await axios.post(`${protocol}://${backend_server}:${backend_port}/api/logout`, {}, { withCredentials: true });
+      } catch (error) {
+        console.error('Logout error:', error);
+      } finally {
+        // 通信の成否に関わらずフロントエンドの状態をクリア
+        commit('logout');
+      }
     },
   },
 });

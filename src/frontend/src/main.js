@@ -10,10 +10,11 @@ loadFonts()
 
 const backend_server = process.env.VUE_APP_BACKEND_SERVER
 const backend_port = process.env.VUE_APP_BACKEND_PORT
+const protocol = process.env.NODE_ENV === 'PROD' ? 'https' : 'http'
 const app = createApp(App)
 
 app.config.globalProperties.$axios = axios.create({
-  baseURL: `https://${backend_server}:${backend_port}/`
+  baseURL: `${protocol}://${backend_server}:${backend_port}/`
 });
 
 app

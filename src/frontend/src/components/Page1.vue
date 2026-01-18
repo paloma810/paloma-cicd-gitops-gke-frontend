@@ -82,8 +82,21 @@ export default {
       this.$router.push(route);
       this.drawer = false;
     },
-    logout() {
-      // Implement logout functionality
+    async logout() {
+      try {
+        // 1. Vuexのlogoutアクションを呼び出す（バックエンドのAPI通信を含む）
+        await this.$store.dispatch('logout');
+        
+        // 2. ログアウト成功後、ログイン画面へ遷移
+        this.$router.push('/login');
+        
+        // （任意）通知を表示する場合など
+        console.log("ログアウトしました");
+      } catch (error) {
+        console.error("ログアウト処理中にエラーが発生しました", error);
+        // エラーが発生しても強制的にログイン画面に戻す
+        this.$router.push('/login');
+      }
     }
   }
 };
