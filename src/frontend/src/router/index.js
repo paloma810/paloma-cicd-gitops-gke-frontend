@@ -29,22 +29,20 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  Store.dispatch('checkAuthentication'); // ページ遷移前に認証情報を確認
+router.beforeEach(async (to, _from, next) => {
+  await Store.dispatch('checkAuthentication'); // ページ遷移前に認証情報を確認（await で完了を待つ）
 
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!Store.state.isAuthenticated) {
-      next({
-        path: '/Login',
-        query: {
-          redirect: to.fullPath
-        }
-      })
-    } else {
-      next();
-    }
+  const isAuthenticated = Store.state.isAuthenticated;
+  const isGuestOnly = to.name === 'home' || to.name === 'login';
+
+  if (isGuestOnly && isAuthenticated) {
+    // ログイン済みで Login/home にアクセスした場合はトップページへ
+    next({ path: '/Page1' });
+  } else if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+    // 認証が必要なページに未認証でアクセスした場合は Login へ
+    next({ path: '/Login', query: { redirect: to.fullPath } });
   } else {
-    next(); 
+    next();
   }
 });
 
