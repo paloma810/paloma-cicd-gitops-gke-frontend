@@ -11,12 +11,17 @@ const theme = createTheme({
   },
 })
 
-export function Providers({ children }: { children: ReactNode }) {
-  const configInit = useConfigStore((s) => s.init)
+interface ProvidersProps {
+  children: ReactNode
+  backendUrl: string
+}
+
+export function Providers({ children, backendUrl }: ProvidersProps) {
+  const setBackendUrl = useConfigStore((s) => s.setBackendUrl)
 
   useEffect(() => {
-    configInit()
-  }, [configInit])
+    setBackendUrl(backendUrl)
+  }, [backendUrl, setBackendUrl])
 
   return (
     <AppRouterCacheProvider>
