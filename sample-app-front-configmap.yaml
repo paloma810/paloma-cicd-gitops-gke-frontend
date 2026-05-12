@@ -3,8 +3,7 @@ kind: ConfigMap
 metadata:
   name: sample-app-front-configmap
 data:
-  NODE_ENV: "PROD"
-  VUE_APP_BACKEND_SERVER: "www.hato-inds.com"
-  VUE_APP_BACKEND_PORT: "443"
-  VUE_APP_WS_HOST: "www.hato-inds.com"
-  VUE_APP_WS_PORT: "8080"
+  BACKEND_PROTOCOL: "https"
+  BACKEND_SERVER: "www.hato-inds.com"
+  BACKEND_PORT: "443"
+  PORT: "8080"
