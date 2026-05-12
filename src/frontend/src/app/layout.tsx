@@ -6,10 +6,17 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  // Server Component: process.env を直接読んで backendUrl を構築する。
+  // fetch('/api/config') を廃止し、本番 Ingress の /api/* ルーティング競合を回避する。
+  const protocol  = process.env.BACKEND_PROTOCOL ?? 'http'
+  const server    = process.env.BACKEND_SERVER   ?? 'localhost'
+  const port      = process.env.BACKEND_PORT     ?? '3000'
+  const backendUrl = `${protocol}://${server}:${port}`
+
   return (
     <html lang="ja">
       <body>
-        <Providers>{children}</Providers>
+        <Providers backendUrl={backendUrl}>{children}</Providers>
       </body>
     </html>
   )
