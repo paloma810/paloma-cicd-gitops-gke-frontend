@@ -26,7 +26,7 @@ spec:
         io.kompose.service: sample-app-front
     spec:
       containers:
-        - image: asia-northeast1-docker.pkg.dev/paloma-cicd/paloma-cicd-repo-gke/sample-app-front:SHORT_SHA
+        - image: asia-northeast1-docker.pkg.dev/paloma-cicd/paloma-cicd-repo-gke/sample-app-front:81aff7b
           name: sample-app-front
           ports:
             - containerPort: 8080
@@ -38,7 +38,7 @@ spec:
                 name: sample-app-front-configmap
           resources:
             requests:
-              cpu: 30m
+              cpu: 50m
               memory: 100Mi
           tty: true
           workingDir: /app
@@ -46,4 +46,3 @@ spec:
       nodeSelector:
         cloud.google.com/gke-nodepool: kh-paloma-m01-01-gke-nodes01
 status: {}
-
