@@ -44,4 +44,3 @@ spec:
           workingDir: /app
       restartPolicy: Always
 status: {}
-
