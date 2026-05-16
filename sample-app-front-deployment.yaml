@@ -38,7 +38,7 @@ spec:
                 name: sample-app-front-configmap
           resources:
             requests:
-              cpu: 50m
+              cpu: 30m
               memory: 100Mi
           tty: true
           workingDir: /app
